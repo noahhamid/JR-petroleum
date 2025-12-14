@@ -19,7 +19,7 @@ export function AboutHero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-6 lg:px-26  pt-32 pb-20">
+      <div className="relative z-10 container mx-auto px-6 lg:px-23 pt-32 pb-20">
         <div className="max-w-2xl">
           <ScrollAnimation direction="left" delay={0}>
             <span className="inline-block px-4 py-2 bg-amber-400/10 border border-amber-400/30 rounded-full text-amber-400 text-sm font-medium mb-6">
@@ -28,14 +28,14 @@ export function AboutHero() {
           </ScrollAnimation>
 
           <ScrollAnimation direction="left" delay={100}>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 text-balance">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
               Powering Ethiopia's
               <span className="block text-amber-400">Progress</span>
             </h1>
           </ScrollAnimation>
 
           <ScrollAnimation direction="left" delay={200}>
-            <p className="text-lg text-white/70 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg text-white/70 leading-relaxed mb-8">
               For nearly four decades, Jr Petroleum has been at the forefront of
               Ethiopia's energy sector, delivering excellence and building
               partnerships that fuel the nation's growth.
