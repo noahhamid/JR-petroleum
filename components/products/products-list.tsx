@@ -85,7 +85,7 @@ const products = [
 export function ProductsList() {
   return (
     <section className="py-24 bg-background">
-      <div className="container mx-auto px-23">
+      <div className="container mx-auto px-6 lg:px-23">
         <ScrollAnimation direction="up">
           <div className="text-center mb-20">
             <span className="text-amber-500 font-semibold text-[13px] uppercase tracking-wider">

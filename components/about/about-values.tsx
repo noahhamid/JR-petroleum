@@ -33,7 +33,7 @@ const values = [
 export function AboutValues() {
   return (
     <section className="py-24 bg-[#0a1628]">
-      <div className="container mx-auto px-23">
+      <div className="container mx-auto px-6 lg:px-23">
         <ScrollAnimation direction="up">
           <div className="text-center mb-16">
             <span className="text-amber-400 font-semibold text-[13px] uppercase tracking-wider">

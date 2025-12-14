@@ -19,7 +19,7 @@ export function AboutHero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-23 pt-32 pb-20">
+      <div className="relative z-10 container mx-auto px-6 lg:px-26  pt-32 pb-20">
         <div className="max-w-2xl">
           <ScrollAnimation direction="left" delay={0}>
             <span className="inline-block px-4 py-2 bg-amber-400/10 border border-amber-400/30 rounded-full text-amber-400 text-sm font-medium mb-6">

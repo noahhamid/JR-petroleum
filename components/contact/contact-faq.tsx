@@ -38,7 +38,7 @@ export function ContactFAQ() {
 
   return (
     <section className="py-24 bg-background">
-      <div className="container mx-auto px-23">
+      <div className="container mx-auto px-6 lg:px-23">
         <ScrollAnimation direction="up">
           <div className="text-center mb-16">
             <span className="text-amber-500 font-semibold text-sm uppercase tracking-wider">

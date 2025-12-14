@@ -184,7 +184,7 @@ export function StationsList() {
 
   return (
     <section className="py-24 bg-background">
-      <div className="container mx-auto px-23">
+      <div className="container mx-auto px-6 lg:px-23">
         {/* Header */}
         <ScrollAnimation direction="up">
           <div className="text-center mb-12">
