@@ -8,13 +8,13 @@ import { ContactFAQ } from "@/components/contact/contact-faq";
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background overflow-hidden">
       <Navbar />
       <ContactHero />
 
       {/* Contact Form & Info Section */}
       <section className="py-24 bg-background">
-        <div className="container mx-auto px-23">
+        <div className="container mx-auto px-6 lg:px-23">
           <div className="grid lg:grid-cols-5 gap-12">
             <div className="lg:col-span-3">
               <ContactForm />
