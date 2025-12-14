@@ -155,14 +155,21 @@ export function HeroSlider() {
           </p>
 
           {/* CTA Buttons */}
+
           <div className="flex flex-wrap gap-4 opacity-0 animate-[slideUp_0.6s_ease-out_0.5s_forwards]">
-            <button className="group px-8 py-4 text-sm bg-gradient-to-r from-amber-400 to-amber-500 text-[#0a1628] font-semibold rounded-lg hover:from-amber-300 hover:to-amber-400 transition-all shadow-lg hover:shadow-amber-400/25 flex items-center gap-2">
+            <a
+              href="/stations"
+              className="group px-8 py-4 text-sm bg-gradient-to-r from-amber-400 to-amber-500 text-[#0a1628] font-semibold rounded-lg hover:from-amber-300 hover:to-amber-400 transition-all shadow-lg hover:shadow-amber-400/25 flex items-center gap-2"
+            >
               Explore More
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="px-8 py-4 border text-sm border-white/30 text-white font-semibold rounded-lg hover:bg-white/10 transition-all">
-              Our Services
-            </button>
+            </a>
+            <a
+              href="/products"
+              className="px-8 py-4 border text-sm border-white/30 text-white font-semibold rounded-lg hover:bg-white/10 transition-all rounded-lg"
+            >
+              Our Products
+            </a>
           </div>
 
           {/* Ethiopian Airlines Partner Badge */}
