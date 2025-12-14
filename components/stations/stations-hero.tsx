@@ -1,0 +1,92 @@
+"use client";
+
+import { ScrollAnimation } from "@/components/scroll-animation";
+import { MapPin, Fuel, Clock } from "lucide-react";
+
+export function StationsHero() {
+  return (
+    <section className="relative min-h-[80vh] flex items-center overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0">
+        <div
+          className="absolute inset-0 bg-cover bg-center scale-105"
+          style={{
+            backgroundImage:
+              "url('/modern-gas-station-night-lights-aerial-view-city-.jpg')",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628] via-[#0a1628]/80 to-transparent" />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 container mx-auto px-23 pt-32 pb-20">
+        <div className="max-w-2xl">
+          <ScrollAnimation direction="left" delay={0}>
+            <div className="flex items-center gap-3 mb-6">
+              <span className="px-4 py-1.75 bg-amber-400 text-[#0a1628] text-sm font-bold rounded-full">
+                50+ Locations
+              </span>
+              <span className="px-4 py-1.75 bg-white/10 border border-white/20 text-white text-sm font-medium rounded-full">
+                Live Stock Status
+              </span>
+            </div>
+          </ScrollAnimation>
+
+          <ScrollAnimation direction="left" delay={100}>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+              Find Your Nearest
+              <span className="block text-amber-400">Jr Station</span>
+            </h1>
+          </ScrollAnimation>
+
+          <ScrollAnimation direction="left" delay={200}>
+            <p className="text-lg text-white/70 leading-relaxed mb-8">
+              Locate our fuel stations across Ethiopia with real-time
+              availability updates. Quality fuel and exceptional service,
+              wherever you are.
+            </p>
+          </ScrollAnimation>
+
+          <ScrollAnimation direction="left" delay={300}>
+            <div className="flex flex-wrap gap-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-amber-400/20 rounded-lg flex items-center justify-center">
+                  <MapPin className="w-6 h-6 text-amber-400" />
+                </div>
+                <div>
+                  <div className="text-white text-sm font-semibold">
+                    Nationwide
+                  </div>
+                  <div className="text-white/50 text-[13px]">Coverage</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-amber-400/20 rounded-lg flex items-center justify-center">
+                  <Fuel className="w-6 h-6 text-amber-400" />
+                </div>
+                <div>
+                  <div className="text-white text-sm font-semibold">
+                    All Fuels
+                  </div>
+                  <div className="text-white/50 text-[13px]">Available</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-amber-400/20 rounded-lg flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-amber-400" />
+                </div>
+                <div>
+                  <div className="text-white text-sm font-semibold">24/7</div>
+                  <div className="text-white/50 text-[13px]">Service</div>
+                </div>
+              </div>
+            </div>
+          </ScrollAnimation>
+        </div>
+      </div>
+
+      {/* Decorative elements */}
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0d0723] via-[#0d0723]/60 to-transparent" />
+    </section>
+  );
+}
