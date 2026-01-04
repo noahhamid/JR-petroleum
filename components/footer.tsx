@@ -95,13 +95,11 @@ export function Footer() {
           supportLinks: Array.isArray(fsData.supportLinks)
             ? fsData.supportLinks
             : DEFAULT_FOOTER.supportLinks,
-          // Most important fix ↓
           socialLinks: Array.isArray(fsData.socialLinks)
             ? fsData.socialLinks
             : DEFAULT_FOOTER.socialLinks,
         });
       }
-      // If no document → keep defaults
     });
 
     return () => unsubscribe();
@@ -111,7 +109,6 @@ export function Footer() {
   const getIcon = (platform?: string) =>
     (platform && iconMap[platform as keyof typeof iconMap]) || Facebook;
 
-  // Safe social links array (fallback to empty if something goes wrong)
   const socialLinks = Array.isArray(data.socialLinks) ? data.socialLinks : [];
 
   return (
@@ -123,11 +120,12 @@ export function Footer() {
           <div className="lg:col-span-2">
             <ScrollAnimation direction="up" delay={0}>
               <Link href="/" className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center">
-                  <span className="text-[#0a1628] font-bold text-xl">
-                    {data.brand?.logoText ?? "Jr"}
-                  </span>
-                </div>
+                {/* Replaced text logo with image */}
+                <img
+                  src="https://res.cloudinary.com/dijiwkewo/image/upload/v1765728857/download__1_-removebg-preview_fn6qpb.png"
+                  alt="Jr Petroleum Logo"
+                  className="w-12 h-12 object-contain"
+                />
                 <div>
                   <span className="font-bold text-xl">
                     {data.brand?.name ?? "Jr Petroleum"}
@@ -258,7 +256,7 @@ export function Footer() {
             </p>
           </ScrollAnimation>
 
-          {/* Social Links – safe rendering */}
+          {/* Social Links */}
           <ScrollAnimation direction="right" delay={0}>
             <div className="flex items-center gap-4">
               {socialLinks.map((social) => {

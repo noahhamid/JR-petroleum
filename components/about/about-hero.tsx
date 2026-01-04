@@ -15,7 +15,7 @@ export function AboutHero() {
               "url('https://res.cloudinary.com/dlfdjcuat/image/upload/v1767533679/Screenshot_2026-01-04_141836_v4fdfm.png')",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628] via-[#0a1628]/85 to-[#0a1628]/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/70 via-[#0a1628]/60 to-[#0a1628]/40" />
       </div>
 
       {/* Content */}

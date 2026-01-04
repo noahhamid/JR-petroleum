@@ -11,20 +11,12 @@ export const metadata: Metadata = {
   title: "Jr Petroleum | Ethiopia's Leading Energy Company",
   description:
     "Jr Petroleum - Powering Ethiopia's future with reliable petroleum products and strategic partnerships with Ethiopian Airlines.",
-  generator: "v0.app",
+
   icons: {
     icon: [
       {
-        url: "/icon-light-32x32.png",
+        url: "https://res.cloudinary.com/dijiwkewo/image/upload/v1765728857/download__1_-removebg-preview_fn6qpb.png",
         media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
       },
     ],
     apple: "/apple-icon.png",
