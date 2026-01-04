@@ -127,11 +127,13 @@ export function HeroSlider() {
         >
           <div
             className={cn(
-              "absolute inset-0 bg-cover bg-center transition-transform duration-[4000ms] ease-out",
+              "absolute inset-0 bg-center transition-transform duration-[4000ms] ease-out",
               index === currentSlide ? "scale-110" : "scale-100"
             )}
             style={{
               backgroundImage: `url(${slide.image})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center 30%", // ← most important change
               transformOrigin: "center center",
             }}
           />
