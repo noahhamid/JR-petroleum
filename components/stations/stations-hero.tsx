@@ -12,7 +12,7 @@ export function StationsHero() {
           className="absolute inset-0 bg-cover bg-center scale-105"
           style={{
             backgroundImage:
-              "url('/modern-gas-station-night-lights-aerial-view-city-.jpg')",
+              "url('https://res.cloudinary.com/dlfdjcuat/image/upload/v1767533682/Screenshot_2026-01-04_160007_brizyu.png')",
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628] via-[#0a1628]/80 to-transparent" />

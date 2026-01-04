@@ -12,7 +12,7 @@ export function ProductsHero() {
           className="absolute inset-0 bg-cover bg-center scale-105"
           style={{
             backgroundImage:
-              "url('/premium-fuel-pump-golden-light-modern-gas-station.jpg')",
+              "url('https://res.cloudinary.com/dlfdjcuat/image/upload/v1767534217/ChatGPT_Image_Jan_4_2026_03_34_57_PM_iudhdn.png')",
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628] via-[#0a1628]/80 to-transparent" />

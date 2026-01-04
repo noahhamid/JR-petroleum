@@ -12,7 +12,7 @@ export function AboutHero() {
           className="absolute inset-0 bg-cover bg-center scale-105"
           style={{
             backgroundImage:
-              "url('/modern-corporate-office-building-sunset-glass-arch.jpg')",
+              "url('https://res.cloudinary.com/dlfdjcuat/image/upload/v1767533679/Screenshot_2026-01-04_141836_v4fdfm.png')",
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628] via-[#0a1628]/85 to-[#0a1628]/50" />
