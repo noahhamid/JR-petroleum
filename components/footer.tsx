@@ -1,3 +1,7 @@
+// components/Footer.tsx
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Facebook,
@@ -8,37 +12,108 @@ import {
   Phone,
   MapPin,
 } from "lucide-react";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { ScrollAnimation } from "@/components/scroll-animation";
 
-const footerLinks = {
-  company: [
+// Icon mapping (case-insensitive support)
+const iconMap = {
+  facebook: Facebook,
+  twitter: Twitter,
+  linkedin: Linkedin,
+  instagram: Instagram,
+  Facebook: Facebook,
+  Twitter: Twitter,
+  LinkedIn: Linkedin,
+  Instagram: Instagram,
+} as const;
+
+// Default data (safe & complete)
+const DEFAULT_FOOTER = {
+  brand: {
+    logoText: "Jr",
+    name: "Jr Petroleum",
+    slogan: "Energy Solutions",
+    description:
+      "Ethiopia's leading petroleum company, powering progress and partnerships across the nation since 1985.",
+  },
+  contact: {
+    phone: "+251 111 234 567",
+    email: "info@jrpetroleum.com",
+    address: "Bole Sub-City, Addis Ababa, Ethiopia",
+  },
+  companyLinks: [
     { name: "About Us", href: "/about" },
     { name: "Careers", href: "/" },
     { name: "News", href: "/" },
     { name: "Sustainability", href: "/" },
   ],
-  services: [
+  servicesLinks: [
     { name: "Retail Fuel", href: "/products" },
     { name: "Aviation Fuel", href: "/products" },
     { name: "Commercial Supply", href: "/products" },
     { name: "Lubricants", href: "/products" },
   ],
-  support: [
+  supportLinks: [
     { name: "Find Stations", href: "/stations" },
     { name: "Contact Us", href: "/contact" },
     { name: "FAQs", href: "/" },
     { name: "Partners", href: "/" },
   ],
+  socialLinks: [
+    { platform: "facebook", href: "#", label: "Facebook" },
+    { platform: "twitter", href: "#", label: "Twitter" },
+    { platform: "linkedin", href: "#", label: "LinkedIn" },
+    { platform: "instagram", href: "#", label: "Instagram" },
+  ],
 };
 
-const socialLinks = [
-  { icon: Facebook, href: "#", label: "Facebook" },
-  { icon: Twitter, href: "#", label: "Twitter" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
-  { icon: Instagram, href: "#", label: "Instagram" },
-];
-
 export function Footer() {
+  const [data, setData] = useState(DEFAULT_FOOTER);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, "settings", "footer"), (snap) => {
+      if (snap.exists()) {
+        const fsData = snap.data() || {};
+
+        setData({
+          ...DEFAULT_FOOTER,
+          brand: {
+            ...DEFAULT_FOOTER.brand,
+            ...(fsData.brand || {}),
+          },
+          contact: {
+            ...DEFAULT_FOOTER.contact,
+            ...(fsData.contact || {}),
+          },
+          companyLinks: Array.isArray(fsData.companyLinks)
+            ? fsData.companyLinks
+            : DEFAULT_FOOTER.companyLinks,
+          servicesLinks: Array.isArray(fsData.servicesLinks)
+            ? fsData.servicesLinks
+            : DEFAULT_FOOTER.servicesLinks,
+          supportLinks: Array.isArray(fsData.supportLinks)
+            ? fsData.supportLinks
+            : DEFAULT_FOOTER.supportLinks,
+          // Most important fix ↓
+          socialLinks: Array.isArray(fsData.socialLinks)
+            ? fsData.socialLinks
+            : DEFAULT_FOOTER.socialLinks,
+        });
+      }
+      // If no document → keep defaults
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Safe icon resolver
+  const getIcon = (platform?: string) =>
+    (platform && iconMap[platform as keyof typeof iconMap]) || Facebook;
+
+  // Safe social links array (fallback to empty if something goes wrong)
+  const socialLinks = Array.isArray(data.socialLinks) ? data.socialLinks : [];
+
   return (
     <footer className="bg-[#0a1628] text-white">
       {/* Main Footer */}
@@ -49,12 +124,16 @@ export function Footer() {
             <ScrollAnimation direction="up" delay={0}>
               <Link href="/" className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center">
-                  <span className="text-[#0a1628] font-bold text-xl">Jr</span>
+                  <span className="text-[#0a1628] font-bold text-xl">
+                    {data.brand?.logoText ?? "Jr"}
+                  </span>
                 </div>
                 <div>
-                  <span className="font-bold text-xl">Jr Petroleum</span>
+                  <span className="font-bold text-xl">
+                    {data.brand?.name ?? "Jr Petroleum"}
+                  </span>
                   <p className="text-amber-400/80 text-xs uppercase tracking-[0.2em]">
-                    Energy Solutions
+                    {data.brand?.slogan ?? "Energy Solutions"}
                   </p>
                 </div>
               </Link>
@@ -62,32 +141,37 @@ export function Footer() {
 
             <ScrollAnimation direction="up" delay={100}>
               <p className="text-white/60 leading-relaxed text-[15px] mb-6 max-w-sm">
-                Ethiopia's leading petroleum company, powering progress and
-                partnerships across the nation since 1985.
+                {data.brand?.description ??
+                  "Ethiopia's leading petroleum company..."}
               </p>
             </ScrollAnimation>
 
-            {/* Contact Info */}
             <ScrollAnimation direction="up" delay={200}>
               <div className="space-y-3">
-                <a
-                  href="tel:+251111234567"
-                  className="flex items-center gap-3 text-sm text-white/60 hover:text-amber-400 transition-colors"
-                >
-                  <Phone className="w-4 h-4" />
-                  <span>+251 111 234 567</span>
-                </a>
-                <a
-                  href="mailto:info@jrpetroleum.com"
-                  className="flex items-center gap-3 text-sm text-white/60 hover:text-amber-400 transition-colors"
-                >
-                  <Mail className="w-4 h-4" />
-                  <span>info@jrpetroleum.com</span>
-                </a>
-                <div className="flex items-start gap-3 text-sm text-white/60">
-                  <MapPin className="w-4 h-4 mt-1" />
-                  <span>Bole Sub-City, Addis Ababa, Ethiopia</span>
-                </div>
+                {data.contact?.phone && (
+                  <a
+                    href={`tel:${data.contact.phone}`}
+                    className="flex items-center gap-3 text-sm text-white/60 hover:text-amber-400 transition-colors"
+                  >
+                    <Phone className="w-4 h-4" />
+                    <span>{data.contact.phone}</span>
+                  </a>
+                )}
+                {data.contact?.email && (
+                  <a
+                    href={`mailto:${data.contact.email}`}
+                    className="flex items-center gap-3 text-sm text-white/60 hover:text-amber-400 transition-colors"
+                  >
+                    <Mail className="w-4 h-4" />
+                    <span>{data.contact.email}</span>
+                  </a>
+                )}
+                {data.contact?.address && (
+                  <div className="flex items-start gap-3 text-sm text-white/60">
+                    <MapPin className="w-4 h-4 mt-1" />
+                    <span>{data.contact.address}</span>
+                  </div>
+                )}
               </div>
             </ScrollAnimation>
           </div>
@@ -99,7 +183,10 @@ export function Footer() {
                 Company
               </h3>
               <ul className="space-y-3">
-                {footerLinks.company.map((link) => (
+                {(Array.isArray(data.companyLinks)
+                  ? data.companyLinks
+                  : []
+                ).map((link) => (
                   <li key={link.name}>
                     <Link
                       href={link.href}
@@ -119,7 +206,10 @@ export function Footer() {
                 Services
               </h3>
               <ul className="space-y-3">
-                {footerLinks.services.map((link) => (
+                {(Array.isArray(data.servicesLinks)
+                  ? data.servicesLinks
+                  : []
+                ).map((link) => (
                   <li key={link.name}>
                     <Link
                       href={link.href}
@@ -139,7 +229,10 @@ export function Footer() {
                 Support
               </h3>
               <ul className="space-y-3">
-                {footerLinks.support.map((link) => (
+                {(Array.isArray(data.supportLinks)
+                  ? data.supportLinks
+                  : []
+                ).map((link) => (
                   <li key={link.name}>
                     <Link
                       href={link.href}
@@ -160,23 +253,27 @@ export function Footer() {
         <div className="container mx-auto px-6 lg:px-23 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <ScrollAnimation direction="left" delay={0}>
             <p className="text-white/40 text-sm">
-              © {new Date().getFullYear()} Jr Petroleum. All rights reserved.
+              © {new Date().getFullYear()} {data.brand?.name ?? "Jr Petroleum"}.
+              All rights reserved.
             </p>
           </ScrollAnimation>
 
-          {/* Social Links */}
+          {/* Social Links – safe rendering */}
           <ScrollAnimation direction="right" delay={0}>
             <div className="flex items-center gap-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-amber-400 hover:text-[#0a1628] transition-all"
-                >
-                  <social.icon className="w-4 h-4" />
-                </a>
-              ))}
+              {socialLinks.map((social) => {
+                const Icon = getIcon(social.platform);
+                return (
+                  <a
+                    key={social.label || social.platform}
+                    href={social.href || "#"}
+                    aria-label={social.label || social.platform}
+                    className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-amber-400 hover:text-[#0a1628] transition-all"
+                  >
+                    <Icon className="w-4 h-4" />
+                  </a>
+                );
+              })}
             </div>
           </ScrollAnimation>
         </div>

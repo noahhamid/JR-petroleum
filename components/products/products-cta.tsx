@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { ScrollAnimation } from "@/components/scroll-animation"
-import Link from "next/link"
-import { Phone, MessageCircle } from "lucide-react"
+import { ScrollAnimation } from "@/components/scroll-animation";
+import Link from "next/link";
+import { Phone, MessageCircle } from "lucide-react";
 
 export function ProductsCta() {
   return (
@@ -28,8 +28,9 @@ export function ProductsCta() {
 
         <ScrollAnimation direction="up" delay={200}>
           <p className="text-xl text-white/70 max-w-2xl mx-auto mb-10">
-            Our team of energy experts is ready to help you find the perfect product for your specific requirements. Get
-            in touch for personalized service.
+            Our team of energy experts is ready to help you find the perfect
+            product for your specific requirements. Get in touch for
+            personalized service.
           </p>
         </ScrollAnimation>
 
@@ -42,16 +43,9 @@ export function ProductsCta() {
               <MessageCircle className="w-5 h-5" />
               Contact Our Team
             </Link>
-            <a
-              href="tel:+251111234567"
-              className="flex items-center gap-2 px-8 py-4 bg-white/10 border border-white/20 text-white font-semibold rounded-lg hover:bg-white/20 transition-colors"
-            >
-              <Phone className="w-5 h-5" />
-              +251 111 234 567
-            </a>
           </div>
         </ScrollAnimation>
       </div>
     </section>
-  )
+  );
 }

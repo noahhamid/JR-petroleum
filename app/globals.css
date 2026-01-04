@@ -7,6 +7,7 @@
 :root {
   --background: oklch(0.98 0 0);
   --foreground: oklch(0.15 0 0);
+  --font-noto-am: 'Noto Sans Ethiopic', sans-serif;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.15 0 0);
   --popover: oklch(1 0 0);
@@ -38,6 +39,16 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+.font-amharic {
+  font-family: var(--font-noto-am) !important;
+}
+
+.font-amharic p, 
+.font-amharic h1, 
+.font-amharic span {
+  line-height: 1.6;
 }
 
 .dark {

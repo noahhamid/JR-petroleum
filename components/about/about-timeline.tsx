@@ -1,41 +1,40 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { db } from "@/lib/firebase";
+import { collection, onSnapshot } from "firebase/firestore";
 import { ScrollAnimation } from "@/components/scroll-animation";
 
-const milestones = [
-  {
-    year: "1985",
-    title: "Foundation",
-    description: "Jr Petroleum established in Addis Ababa",
-  },
-  {
-    year: "1992",
-    title: "Expansion",
-    description: "Opened first 10 fuel stations across Ethiopia",
-  },
-  {
-    year: "2001",
-    title: "Aviation Partnership",
-    description: "Began supplying aviation fuel to Ethiopian Airlines",
-  },
-  {
-    year: "2010",
-    title: "Regional Growth",
-    description: "Expanded operations to 5 regions",
-  },
-  {
-    year: "2018",
-    title: "Modernization",
-    description: "Launched digital payment systems at all stations",
-  },
-  {
-    year: "2023",
-    title: "Sustainability",
-    description: "Introduced eco-friendly fuel options",
-  },
-];
+type Milestone = {
+  id: string;
+  year: string;
+  title: string;
+  description: string;
+};
 
 export function AboutTimeline() {
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
+
+  // Fetch milestones from Firestore in real-time
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "milestones"), (snapshot) => {
+      const fetched = snapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          } as Milestone)
+      );
+      // Optional: Sort by year if needed
+      const sorted = fetched.sort(
+        (a, b) => parseInt(a.year) - parseInt(b.year)
+      );
+      setMilestones(sorted);
+    });
+
+    return () => unsub();
+  }, []);
+
   return (
     <section className="py-24 bg-muted/30">
       <div className="container mx-auto px-6 lg:px-23">
@@ -44,7 +43,7 @@ export function AboutTimeline() {
             <span className="text-amber-500 font-semibold text-[13px] uppercase tracking-wider">
               Our Journey
             </span>
-            <h2 className="text-3xl font-bold  text-foreground mt-2">
+            <h2 className="text-3xl font-bold text-foreground mt-2">
               Key Milestones
             </h2>
           </div>
@@ -57,7 +56,7 @@ export function AboutTimeline() {
           <div className="space-y-12">
             {milestones.map((milestone, index) => (
               <ScrollAnimation
-                key={milestone.year}
+                key={milestone.id}
                 direction={index % 2 === 0 ? "left" : "right"}
                 delay={index * 100}
               >

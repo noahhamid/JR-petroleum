@@ -1,26 +1,57 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { db } from "@/lib/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 import { ScrollAnimation } from "@/components/scroll-animation";
 import { Target, Eye } from "lucide-react";
 
 export function AboutStory() {
+  const [storyData, setStoryData] = useState({
+    content: "",
+    years: "38+",
+    image: "/modern-petroleum-company-headquarters-building--co.jpg",
+    mission: "",
+    vision: "",
+  });
+
+  useEffect(() => {
+    const storyDocRef = doc(db, "about", "story");
+    const unsub = onSnapshot(storyDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setStoryData({
+          content: data?.content || "",
+          years: data?.years || "38+",
+          image:
+            data?.image ||
+            "/modern-petroleum-company-headquarters-building--co.jpg",
+          mission: data?.mission || "",
+          vision: data?.vision || "",
+        });
+      }
+    });
+
+    return () => unsub();
+  }, []);
+
   return (
     <section className="py-24 bg-background">
-      <div className="container mx-auto px-6 lg:px-23 ">
+      <div className="container mx-auto px-6 lg:px-23">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Image Side */}
           <ScrollAnimation direction="left">
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <img
-                  src="/modern-petroleum-company-headquarters-building--co.jpg"
+                  src={storyData.image}
                   alt="Jr Petroleum Headquarters"
                   className="w-full h-[450px] object-cover"
                 />
               </div>
               {/* Floating stats card */}
               <div className="absolute -bottom-8 -right-8 bg-amber-400 text-[#0a1628] p-6 rounded-xl shadow-xl">
-                <div className="text-4xl font-bold">38+</div>
+                <div className="text-4xl font-bold">{storyData.years}</div>
                 <div className="text-sm font-medium">Years of Excellence</div>
               </div>
             </div>
@@ -32,26 +63,14 @@ export function AboutStory() {
               <span className="text-amber-500 font-semibold text-[13px] uppercase tracking-wider">
                 Our Story
               </span>
-              <h2 className="text-3xl  font-bold text-foreground mt-2 mb-6">
+              <h2 className="text-3xl font-bold text-foreground mt-2 mb-6">
                 A Legacy of Energy Excellence
               </h2>
             </ScrollAnimation>
 
             <ScrollAnimation direction="right" delay={200}>
               <p className="text-muted-foreground leading-relaxed text-[15px] mb-6">
-                Founded in 1985, Jr Petroleum began as a small fuel distribution
-                company in Addis Ababa. Through unwavering commitment to quality
-                and customer service, we have grown to become one of Ethiopia's
-                most trusted petroleum companies.
-              </p>
-            </ScrollAnimation>
-
-            <ScrollAnimation direction="right" delay={300}>
-              <p className="text-muted-foreground leading-relaxed text-[15px] mb-8">
-                Our strategic partnership with Ethiopian Airlines, spanning over
-                two decades, showcases our capability to meet the highest
-                international standards in aviation fuel supply, supporting the
-                growth of Africa's largest airline.
+                {storyData.content || "Loading story..."}
               </p>
             </ScrollAnimation>
 
@@ -67,8 +86,7 @@ export function AboutStory() {
                       Our Mission
                     </h3>
                     <p className="text-[13px] text-muted-foreground">
-                      To deliver reliable energy solutions that power progress
-                      across Ethiopia.
+                      {storyData.mission || "Loading mission..."}
                     </p>
                   </div>
                 </div>
@@ -84,8 +102,7 @@ export function AboutStory() {
                       Our Vision
                     </h3>
                     <p className="text-[13px] text-muted-foreground">
-                      To be East Africa's most trusted and innovative energy
-                      partner.
+                      {storyData.vision || "Loading vision..."}
                     </p>
                   </div>
                 </div>

@@ -1,3 +1,4 @@
+// components/ProductsList.tsx (or wherever it's used)
 "use client";
 
 import { useState, useEffect } from "react";
@@ -20,19 +21,17 @@ type Product = {
 export function ProductsList() {
   const [products, setProducts] = useState<Product[]>([]);
 
-  // Fetch products from Firestore in real-time
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "products"), (snapshot) => {
-      const fetchedProducts = snapshot.docs.map(
+      const data = snapshot.docs.map(
         (doc) =>
           ({
             id: doc.id,
             ...doc.data(),
           } as Product)
       );
-      setProducts(fetchedProducts);
+      setProducts(data);
     });
-
     return () => unsub();
   }, []);
 
@@ -79,12 +78,13 @@ export function ProductsList() {
                         alt={product.name}
                         className="w-full h-75 md:h-100 object-cover transition-transform duration-700 group-hover:scale-105"
                       />
-                      {/* Badge */}
-                      <div className="absolute top-6 left-6">
-                        <span className="px-4 py-2 bg-amber-400 text-[#0a1628] text-[13px] font-bold rounded-full shadow-lg">
-                          {product.badge}
-                        </span>
-                      </div>
+                      {product.badge && (
+                        <div className="absolute top-6 left-6">
+                          <span className="px-4 py-2 bg-amber-400 text-[#0a1628] text-[13px] font-bold rounded-full shadow-lg">
+                            {product.badge}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </ScrollAnimation>

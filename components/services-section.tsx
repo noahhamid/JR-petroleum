@@ -1,41 +1,45 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { db } from "@/lib/firebase";
+import { collection, onSnapshot } from "firebase/firestore";
 import { Fuel, Truck, Building2, Plane, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollAnimation } from "@/components/scroll-animation";
 
-const services = [
-  {
-    icon: Fuel,
-    title: "Retail Fuel",
-    description:
-      "Premium petrol and diesel at over 100 stations nationwide, with quality you can trust.",
-    color: "from-amber-400 to-orange-500",
-  },
-  {
-    icon: Plane,
-    title: "Aviation Fuel",
-    description:
-      "Jet fuel solutions for major airlines, ensuring safe and efficient flight operations.",
-    color: "from-green-400 to-emerald-600",
-  },
-  {
-    icon: Truck,
-    title: "Commercial Supply",
-    description:
-      "Bulk fuel delivery for businesses, construction sites, and industrial operations.",
-    color: "from-blue-400 to-blue-600",
-  },
-  {
-    icon: Building2,
-    title: "Industrial Solutions",
-    description:
-      "Specialized petroleum products for manufacturing and heavy industry sectors.",
-    color: "from-slate-400 to-slate-600",
-  },
-];
+type Service = {
+  id: string;
+  icon: string; // string key for ICON_MAP
+  title: string;
+  description: string;
+  color: string;
+};
+
+const ICON_MAP: Record<string, any> = {
+  Fuel: Fuel,
+  Plane: Plane,
+  Truck: Truck,
+  Building2: Building2,
+};
 
 export function ServicesSection() {
+  const [services, setServices] = useState<Service[]>([]);
+
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "services"), (snapshot) => {
+      const fetched = snapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          } as Service)
+      );
+      setServices(fetched);
+    });
+
+    return () => unsub();
+  }, []);
+
   return (
     <section className="py-24 bg-background">
       <div className="container mx-auto px-6 lg:px-23">
@@ -64,38 +68,40 @@ export function ServicesSection() {
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {services.map((service, index) => (
-            <ScrollAnimation
-              key={service.title}
-              direction="up"
-              delay={300 + index * 100}
-            >
-              <div className="group relative bg-card border border-border rounded-2xl p-8 hover:shadow-xl transition-all duration-500 hover:-translate-y-2 h-full">
-                {/* Icon */}
-                <div
-                  className={cn(
-                    "w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center mb-6 group-hover:scale-110 transition-transform",
-                    service.color
-                  )}
-                >
-                  <service.icon className="w-7 h-7 text-white" />
+          {services.map((service, index) => {
+            const IconComponent = ICON_MAP[service.icon] || Fuel; // fallback
+
+            return (
+              <ScrollAnimation
+                key={service.id}
+                direction="up"
+                delay={300 + index * 100}
+              >
+                <div className="group relative bg-card border border-border rounded-2xl p-8 hover:shadow-xl transition-all duration-500 hover:-translate-y-2 h-full">
+                  {/* Icon */}
+                  <div
+                    className={cn(
+                      "w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center mb-6 group-hover:scale-110 transition-transform",
+                      service.color
+                    )}
+                  >
+                    <IconComponent className="w-7 h-7 text-white" />
+                  </div>
+
+                  {/* Content */}
+                  <h3 className="text-lg font-bold text-foreground mb-3">
+                    {service.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                    {service.description}
+                  </p>
+
+                  {/* Hover Gradient */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-
-                {/* Content */}
-                <h3 className="text-lg font-bold text-foreground mb-3">
-                  {service.title}
-                </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-                  {service.description}
-                </p>
-
-                {/* Link */}
-
-                {/* Hover Gradient */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-            </ScrollAnimation>
-          ))}
+              </ScrollAnimation>
+            );
+          })}
         </div>
       </div>
     </section>

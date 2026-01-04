@@ -1,16 +1,45 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { db } from "@/lib/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { ScrollAnimation } from "@/components/scroll-animation";
 
-const features = [
-  "Ethiopia's leading petroleum distributor",
-  "Official partner of Ethiopian Airlines",
-  "ISO certified quality standards",
-  "Sustainable energy practices",
-];
+type AboutPreviewData = {
+  image: string;
+  years: string;
+  title: string;
+  description: string;
+  features: string[];
+};
 
 export function AboutPreview() {
+  const [data, setData] = useState<AboutPreviewData>({
+    image: "/modern-petroleum-company-headquarters-building--co.jpg",
+    years: "38+",
+    title: "Powering Ethiopia's Growth Since 1985",
+    description:
+      "Jr Petroleum has been at the forefront of Ethiopia's energy sector for nearly four decades. Our commitment to quality, innovation, and sustainability has made us the trusted choice for millions of customers and major partners including Ethiopian Airlines.",
+    features: [
+      "Ethiopia's leading petroleum distributor",
+      "Official partner of Ethiopian Airlines",
+      "ISO certified quality standards",
+      "Sustainable energy practices",
+    ],
+  });
+
+  useEffect(() => {
+    const docRef = doc(db, "about_preview", "main");
+    const unsub = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setData(docSnap.data() as AboutPreviewData);
+      }
+    });
+
+    return () => unsub();
+  }, []);
+
   return (
     <section className="py-24 bg-background overflow-hidden">
       <div className="container mx-auto px-6 lg:px-23">
@@ -20,7 +49,7 @@ export function AboutPreview() {
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden">
                 <img
-                  src="/modern-petroleum-company-headquarters-building--co.jpg"
+                  src={data.image}
                   alt="Jr Petroleum Headquarters"
                   className="w-full h-[500px] object-cover"
                 />
@@ -29,7 +58,7 @@ export function AboutPreview() {
 
               {/* Floating Stats Card */}
               <div className="absolute -bottom-8 -right-8 bg-white shadow-2xl rounded-2xl p-6 border border-border">
-                <p className="text-4xl font-bold text-primary">38+</p>
+                <p className="text-4xl font-bold text-primary">{data.years}</p>
                 <p className="text-muted-foreground text-sm">
                   Years of Excellence
                 </p>
@@ -47,23 +76,19 @@ export function AboutPreview() {
 
             <ScrollAnimation direction="up" delay={100}>
               <h2 className="text-3xl font-bold text-foreground mb-6 text-balance">
-                Powering Ethiopia's Growth Since 1985
+                {data.title}
               </h2>
             </ScrollAnimation>
 
             <ScrollAnimation direction="up" delay={200}>
               <p className="text-muted-foreground text-md leading-relaxed mb-8">
-                Jr Petroleum has been at the forefront of Ethiopia's energy
-                sector for nearly four decades. Our commitment to quality,
-                innovation, and sustainability has made us the trusted choice
-                for millions of customers and major partners including Ethiopian
-                Airlines.
+                {data.description}
               </p>
             </ScrollAnimation>
 
             {/* Features List */}
             <div className="space-y-4 mb-8">
-              {features.map((feature, index) => (
+              {data.features.map((feature, index) => (
                 <ScrollAnimation
                   key={feature}
                   direction="up"

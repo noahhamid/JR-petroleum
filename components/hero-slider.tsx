@@ -1,101 +1,118 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { db } from "@/lib/firebase";
+import { collection, onSnapshot } from "firebase/firestore";
 import { ChevronRight, Plane } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const slides = [
-  {
-    id: 1,
-    image: "/ethiopian-airlines-airplane-refueling-at-airport-w.jpg",
-    title: "Proud Partner of Ethiopian Airlines",
-    subtitle: "Aviation Fuel Excellence",
-    description:
-      "Powering Africa's largest airline with premium aviation fuel, ensuring safe and reliable flights across the globe.",
-    badge: "Strategic Partnership",
-    showPartner: true,
-  },
-  {
-    id: 2,
-    image:
-      "https://res.cloudinary.com/dijiwkewo/image/upload/v1765722482/IMG-20251211-WA0015_fu2lob.jpg",
-    title: "Powering Ethiopia's Future",
-    subtitle: "Energy Leadership",
-    description:
-      "Leading the nation's energy sector with state-of-the-art infrastructure and sustainable solutions for tomorrow.",
-    badge: "Since 1985",
-    showPartner: false,
-  },
-  {
-    id: 3,
-    image:
-      "https://res.cloudinary.com/dijiwkewo/image/upload/v1765721617/IMG-20251211-WA0027_r8yloo.jpg",
-    title: "Quality at Every Station",
-    subtitle: "Nationwide Network",
-    description:
-      "Over 100 stations across Ethiopia, delivering premium fuel products with exceptional customer service.",
-    badge: "100+ Stations",
-    showPartner: false,
-  },
-  {
-    id: 4,
-    image:
-      "https://res.cloudinary.com/dijiwkewo/image/upload/v1765722602/IMG-20251211-WA0031_xgjopp.jpg",
-    title: "Reliable Distribution",
-    subtitle: "Logistics Excellence",
-    description:
-      "Our extensive fleet ensures timely delivery of petroleum products to every corner of Ethiopia.",
-    badge: "24/7 Operations",
-    showPartner: false,
-  },
-];
+type Slide = {
+  id: string;
+  image: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  badge: string;
+  showPartner: boolean;
+};
 
 const SLIDE_INTERVAL = 4000;
 
 export function HeroSlider() {
+  const [slides, setSlides] = useState<Slide[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [animationKey, setAnimationKey] = useState(0);
   const [progress, setProgress] = useState(0);
-  const progressRef = useRef<NodeJS.Timeout | null>(null);
-  const slideRef = useRef<NodeJS.Timeout | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // Track initial loading
+
+  const slideTimer = useRef<NodeJS.Timeout | null>(null);
+  const progressTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Fetch slides from Firestore
+  useEffect(() => {
+    setIsLoading(true);
+
+    const unsub = onSnapshot(collection(db, "hero_slides"), (snapshot) => {
+      const fetched = snapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          } as Slide)
+      );
+      setSlides(fetched);
+      setIsLoading(false); // Data loaded → hide spinner
+    });
+
+    return () => unsub();
+  }, []);
+
+  const resetTimers = useCallback(() => {
+    if (slideTimer.current) clearInterval(slideTimer.current);
+    if (progressTimer.current) clearInterval(progressTimer.current);
+
+    setProgress(0);
+
+    progressTimer.current = setInterval(() => {
+      setProgress((prev) =>
+        prev >= 100 ? 100 : prev + 100 / (SLIDE_INTERVAL / 40)
+      );
+    }, 40);
+
+    slideTimer.current = setInterval(() => {
+      setAnimationKey((prev) => prev + 1);
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+      setProgress(0);
+    }, SLIDE_INTERVAL);
+  }, [slides.length]);
+
+  useEffect(() => {
+    if (slides.length === 0 || isLoading) return;
+    resetTimers();
+
+    return () => {
+      if (slideTimer.current) clearInterval(slideTimer.current);
+      if (progressTimer.current) clearInterval(progressTimer.current);
+    };
+  }, [currentSlide, slides.length, isLoading, resetTimers]);
 
   const goToSlide = useCallback(
     (index: number) => {
-      if (index === currentSlide) return;
+      if (index === currentSlide || index < 0 || index >= slides.length) return;
       setAnimationKey((prev) => prev + 1);
       setCurrentSlide(index);
       setProgress(0);
     },
-    [currentSlide]
+    [currentSlide, slides.length]
   );
 
   const nextSlide = useCallback(() => {
     setAnimationKey((prev) => prev + 1);
     setCurrentSlide((prev) => (prev + 1) % slides.length);
     setProgress(0);
-  }, []);
+  }, [slides.length]);
 
-  useEffect(() => {
-    // Clear existing timers
-    if (slideRef.current) clearInterval(slideRef.current);
-    if (progressRef.current) clearInterval(progressRef.current);
+  if (isLoading) {
+    return (
+      <div className="relative h-screen w-full flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
+        <div className="relative w-20 h-20">
+          {/* Spinner */}
+          <div className="absolute inset-0 border-4 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
+          <div className="absolute inset-0 border-4 border-transparent border-t-emerald-400 rounded-full animate-spin animate-[spin_1.5s_linear_infinite]" />
+          <div className="absolute inset-4 bg-gradient-to-r from-amber-400 to-emerald-400 rounded-full opacity-20 blur-md animate-pulse" />
+          <div className="absolute inset-0 flex items-center justify-center text-white text-sm font-medium"></div>
+        </div>
+      </div>
+    );
+  }
 
-    // Start progress animation (updates every 40ms for smooth animation)
-    progressRef.current = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) return 100;
-        return prev + 100 / (SLIDE_INTERVAL / 40);
-      });
-    }, 40);
-
-    // Auto advance slide
-    slideRef.current = setInterval(nextSlide, SLIDE_INTERVAL);
-
-    return () => {
-      if (slideRef.current) clearInterval(slideRef.current);
-      if (progressRef.current) clearInterval(progressRef.current);
-    };
-  }, [nextSlide, currentSlide]);
+  if (slides.length === 0) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-900 text-white">
+        <p>No slides available</p>
+      </div>
+    );
+  }
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
@@ -108,7 +125,6 @@ export function HeroSlider() {
             index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
           )}
         >
-          {/* Background Image with Zoom Effect */}
           <div
             className={cn(
               "absolute inset-0 bg-cover bg-center transition-transform duration-[4000ms] ease-out",
@@ -119,8 +135,6 @@ export function HeroSlider() {
               transformOrigin: "center center",
             }}
           />
-
-          {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/70 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628]/50 via-transparent to-transparent" />
         </div>
@@ -129,7 +143,6 @@ export function HeroSlider() {
       {/* Content */}
       <div className="relative z-20 h-full container mx-auto px-6 lg:px-23 flex items-center">
         <div className="max-w-2xl" key={animationKey}>
-          {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-400/10 border border-amber-400/30 rounded-full mb-6 opacity-0 animate-[slideUp_0.6s_ease-out_0.1s_forwards]">
             {slides[currentSlide].showPartner && (
               <Plane className="w-4 h-4 text-amber-400" />
@@ -139,22 +152,17 @@ export function HeroSlider() {
             </span>
           </div>
 
-          {/* Subtitle */}
           <p className="text-amber-400/80 text-[13px] uppercase tracking-[0.3em] mb-4 opacity-0 animate-[slideUp_0.6s_ease-out_0.2s_forwards]">
             {slides[currentSlide].subtitle}
           </p>
 
-          {/* Title */}
           <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-6 text-balance opacity-0 animate-[slideUp_0.6s_ease-out_0.3s_forwards]">
             {slides[currentSlide].title}
           </h1>
 
-          {/* Description */}
           <p className="text-white/70 text-lg leading-relaxed mb-8 max-w-xl opacity-0 animate-[slideUp_0.6s_ease-out_0.4s_forwards]">
             {slides[currentSlide].description}
           </p>
-
-          {/* CTA Buttons */}
 
           <div className="flex flex-wrap gap-4 opacity-0 animate-[slideUp_0.6s_ease-out_0.5s_forwards]">
             <a
@@ -166,13 +174,12 @@ export function HeroSlider() {
             </a>
             <a
               href="/products"
-              className="px-8 py-4 border text-sm border-white/30 text-white font-semibold rounded-lg hover:bg-white/10 transition-all rounded-lg"
+              className="px-8 py-4 border text-sm border-white/30 text-white font-semibold rounded-lg hover:bg-white/10 transition-all"
             >
               Our Products
             </a>
           </div>
 
-          {/* Ethiopian Airlines Partner Badge */}
           {slides[currentSlide].showPartner && (
             <div className="mt-10 inline-flex items-center gap-4 px-6 py-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl opacity-0 animate-[slideUp_0.6s_ease-out_0.6s_forwards]">
               <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
@@ -191,6 +198,7 @@ export function HeroSlider() {
         </div>
       </div>
 
+      {/* Progress Dots */}
       <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4">
         {slides.map((_, index) => (
           <button
@@ -203,16 +211,11 @@ export function HeroSlider() {
                 : "w-3 bg-white/20 hover:bg-white/40"
             )}
           >
-            {/* Progress fill for active slide */}
             {index === currentSlide && (
               <div
                 className="absolute inset-y-0 left-0 bg-amber-400 rounded-full transition-[width] duration-100 ease-linear"
                 style={{ width: `${progress}%` }}
               />
-            )}
-            {/* Dot indicator for inactive slides */}
-            {index !== currentSlide && (
-              <div className="absolute inset-0 rounded-full" />
             )}
           </button>
         ))}
@@ -225,7 +228,6 @@ export function HeroSlider() {
         <span className="text-white/40 text-sm">0{slides.length}</span>
       </div>
 
-      {/* Inline keyframes for slideUp animation */}
       <style jsx>{`
         @keyframes slideUp {
           from {

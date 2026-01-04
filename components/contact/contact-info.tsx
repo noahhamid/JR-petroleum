@@ -1,5 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { db } from "@/lib/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 import { ScrollAnimation } from "@/components/scroll-animation";
 import {
   MapPin,
@@ -13,39 +16,69 @@ import {
   Instagram,
 } from "lucide-react";
 
-const contactDetails = [
-  {
-    icon: MapPin,
-    title: "Head Office",
-    details: ["Bole Road, Addis Ababa", "Ethiopia, 1000"],
+// --- EXISTING DATA AS DEFAULT ---
+const DEFAULT_INFO = {
+  address: "Bole Road, Addis Ababa, Ethiopia, 1000",
+  phones: ["+251 11 234 5678", "+251 11 234 5679"],
+  emails: ["info@jrpetroleum.et", "support@jrpetroleum.et"],
+  hours: ["Mon - Fri: 8:00 AM - 6:00 PM", "Sat: 9:00 AM - 1:00 PM"],
+  emergencyPhone: "+251 11 999 8888",
+  socials: {
+    facebook: "#",
+    twitter: "#",
+    linkedin: "#",
+    instagram: "#",
   },
-  {
-    icon: Phone,
-    title: "Phone Numbers",
-    details: ["+251 11 234 5678", "+251 11 234 5679"],
-  },
-  {
-    icon: Mail,
-    title: "Email Addresses",
-    details: ["info@jrpetroleum.et", "support@jrpetroleum.et"],
-  },
-  {
-    icon: Clock,
-    title: "Business Hours",
-    details: ["Mon - Fri: 8:00 AM - 6:00 PM", "Sat: 9:00 AM - 1:00 PM"],
-  },
-];
-
-const socialLinks = [
-  { icon: Facebook, href: "#", label: "Facebook" },
-  { icon: Twitter, href: "#", label: "Twitter" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
-  { icon: Instagram, href: "#", label: "Instagram" },
-];
+};
 
 export function ContactInfo() {
+  // Initialize state with the existing data
+  const [data, setData] = useState(DEFAULT_INFO);
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, "settings", "contact_info"), (docSnap) => {
+      if (docSnap.exists()) {
+        // Overwrite defaults with database data if it exists
+        setData(docSnap.data() as typeof DEFAULT_INFO);
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  // Map the state (Default or DB) to your UI structure
+  const contactDetails = [
+    {
+      icon: MapPin,
+      title: "Head Office",
+      details: [data.address],
+    },
+    {
+      icon: Phone,
+      title: "Phone Numbers",
+      details: data.phones,
+    },
+    {
+      icon: Mail,
+      title: "Email Addresses",
+      details: data.emails,
+    },
+    {
+      icon: Clock,
+      title: "Business Hours",
+      details: data.hours,
+    },
+  ];
+
+  const socialLinks = [
+    { icon: Facebook, href: data.socials.facebook, label: "Facebook" },
+    { icon: Twitter, href: data.socials.twitter, label: "Twitter" },
+    { icon: Linkedin, href: data.socials.linkedin, label: "LinkedIn" },
+    { icon: Instagram, href: data.socials.instagram, label: "Instagram" },
+  ];
+
   return (
     <div className="space-y-8">
+      {/* 1. Main Contact Info */}
       <ScrollAnimation direction="right">
         <div className="bg-card border border-border rounded-3xl p-8 shadow-xl">
           <span className="text-amber-500 font-semibold text-[12px] uppercase tracking-wider">
@@ -56,7 +89,7 @@ export function ContactInfo() {
           </h2>
 
           <div className="space-y-6">
-            {contactDetails.map((item, index) => (
+            {contactDetails.map((item) => (
               <div key={item.title} className="flex gap-4">
                 <div className="w-12 h-12 bg-amber-400/10 rounded-xl flex items-center justify-center shrink-0">
                   <item.icon className="w-6 h-6 text-amber-500" />
@@ -65,11 +98,8 @@ export function ContactInfo() {
                   <h3 className="font-semibold text-sm text-foreground">
                     {item.title}
                   </h3>
-                  {item.details.map((detail) => (
-                    <p
-                      key={detail}
-                      className="text-muted-foreground text-[13px]"
-                    >
+                  {item.details.map((detail, i) => (
+                    <p key={i} className="text-muted-foreground text-[13px]">
                       {detail}
                     </p>
                   ))}
@@ -80,6 +110,7 @@ export function ContactInfo() {
         </div>
       </ScrollAnimation>
 
+      {/* 2. Connect Card */}
       <ScrollAnimation direction="right" delay={100}>
         <div className="bg-card border border-border rounded-3xl p-8 shadow-xl">
           <h3 className="font-bold text-foreground mb-4">Connect With Us</h3>
@@ -88,6 +119,8 @@ export function ContactInfo() {
               <a
                 key={social.label}
                 href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label={social.label}
                 className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center text-muted-foreground hover:bg-amber-400 hover:text-[#0a1628] transition-all duration-300"
               >
@@ -98,6 +131,7 @@ export function ContactInfo() {
         </div>
       </ScrollAnimation>
 
+      {/* 3. Emergency Card */}
       <ScrollAnimation direction="right" delay={200}>
         <div className="bg-gradient-to-br from-[#0a1628] to-[#1a2d4a] rounded-3xl p-8 text-white shadow-xl">
           <div className="flex items-center gap-3 mb-4">
@@ -110,7 +144,9 @@ export function ContactInfo() {
           </p>
           <div className="flex items-center gap-2">
             <Phone className="w-4 h-4 text-amber-400" />
-            <span className="font-bold text-amber-400">+251 11 999 8888</span>
+            <span className="font-bold text-amber-400">
+              {data.emergencyPhone}
+            </span>
           </div>
         </div>
       </ScrollAnimation>
